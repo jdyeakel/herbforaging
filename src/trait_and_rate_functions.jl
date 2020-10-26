@@ -255,13 +255,14 @@ function mean_particle_mass(mass, gut_type)
     # mass in g
 
     mass_g = mass * 1000; # convert mass kg -> g
+    mean_particle_size = 0.0;
     if gut_type == "rumen foregut" # ruminant
         mean_particle_size = (7.74 * (mass_g)^0.22)
 
     elseif gut_type == "colon" # hindgut
         mean_particle_size = (6.61 * (mass_g)^0.26)
 
-        else print("what are these guts?")
+        else mean_particle_size = (6.61 * (mass_g)^0.26) # print("what are these guts?")
 
     end
 
@@ -273,7 +274,7 @@ function mean_particle_mass(mass, gut_type)
 end
 
 
-function outflow_rate(gut_fill, gut_fill_max, mrt, mps)
+function outflow_rate(gut_fill_max, mrt)
     # function to capture processing rate of gut
     # gut_fill [g], mrt [s]
     gamma =  gut_fill_max / mrt #gut_fill_max  #[g/s]
@@ -339,6 +340,14 @@ function find_metabolism(mass)
     cost_basal =  3.4/1000 * mass^-0.75 # j/s -> kj/s
     cost_field = 1.54 * cost_basal # kj/s
 
-    return storage_kj, cost_basal, cost_field, storage_kj*2
+    return storage_kj, cost_basal, cost_field
 
+end
+
+function indperarea(mass)
+    #Enter mass in kg
+    #Conver to grams
+    massg = mass*1000;
+    popdensity = (0.0116)*massg^-0.776;
+    return popdensity
 end
