@@ -55,7 +55,7 @@ configurations = 100000;
 for i=1:length(zetavec)
     zeta = zetavec[i];
 
-    rfitvec = Array{Float64}(undef,cyears*365)
+    rfitvec = Array{Float64}(undef,reps)
     for r = 1:reps
         gr, cgut, cfat, ginfo,gprob = acrossdaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,gut_type,kmax,tmax_bout,cyears,configurations);
         rfitvec[r] = sum(cfat)/(maximum(cfat)*cyears*365)
@@ -70,3 +70,5 @@ for i=1:length(zetavec)
         println(percentdone)
     end
 end
+
+R"plot($rfit,pch=16)"
