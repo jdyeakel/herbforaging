@@ -32,7 +32,7 @@ function acrossdaysim_singleres(
     
     # Visually check distributions
     greturnmean = dot(greturnprob,greturninfo);
-    # R"barplot($greturnprob)";
+    # R"plot($greturninfo,$greturnprob,type='b')"
 
     
     # CALCULATE twait
@@ -48,6 +48,7 @@ function acrossdaysim_singleres(
     passrate = (1/mrt) * particle_mass; #particle/s * gram / particle = grams/s
 
     # Single day gut passage
+    # passage rate of a kJ within a single particle (needs to be multiplied by kJ in stomach to get total kJ passing in a day)
     gutpass = passrate * secday * edensity; # grams/s * s/day * kJ/gram = kJ/day
 
     # Metabolic loss per day
@@ -69,12 +70,13 @@ function acrossdaysim_singleres(
 
     # Because MRT is positively linked to the digestive efficiency of a herbivore (Foose, 1982; Udén and Van Soest, 1982; Clauss et al., 2007b),
     # epsilon = (max_retention_time(mass) - mean_retention_time(mass, gut_type))/(max_retention_time(mass) - (min_retention_time(mass)));
-    epsilon = 0.5;
+    epsilon = 0.1;
 
     daysincyears = Int64(floor(365*cyears));  
 
     cgut = zeros(daysincyears);
     cfat = zeros(daysincyears);
+    gr = zeros(daysincyears);
 
     #Starting conditions
     cgut[1] = maxgut;
@@ -86,19 +88,24 @@ function acrossdaysim_singleres(
         if cfat[t-1] > 0.0
             #Draw daily return
             fdraw = rand();
-            gutreturn = greturninfo[findall(x->x>fdraw,probline)[1]];
 
-            #Problem... gut passage rate has to be multiplied by gut contents!
+            #draw from greturns (allowed to be > stomach size)
+            gutreturn = greturninfo[findall(x->x>fdraw,probline)[1]]; #kJ
+            gr[t] = gutreturn;
 
+            #Change in stomach contents
             deltagut = (gutreturn - cgut[t-1]*gutpass);
             cgut[t] = minimum([maximum([cgut[t-1] + deltagut,0.0]),maxgut]);
 
             deltafat = (epsilon*cgut[t-1]*gutpass - field_cost - rest_cost);
+
+            #We might want an incorporation compartment... where gut contents are passed to a compartment, and added to fat at a constant rate...
+
             cfat[t] = minimum([maximum([cfat[t-1] + deltafat,0.0]),maxfatstorage]);
         end
     end
 
-    return cgut, cfat
+    return gr, cgut, cfat, greturninfo, greturnprob
 
 
 end
