@@ -121,7 +121,7 @@ function acrossdaysim_singleres(
     end
         
 
-    return gr, cgut, cfat, ginfo, gprob
+    return gr, cgut, cfat
 
 
 end
