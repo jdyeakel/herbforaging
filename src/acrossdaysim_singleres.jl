@@ -83,18 +83,27 @@ function acrossdaysim_singleres(
     cfat[1] = maxfatstorage;
 
     probline = cumsum(greturnprob);
+    probline = probline/maximum(probline);
     
     for t=2:daysincyears
         if cfat[t-1] > 0.0
             #Draw daily return
             fdraw = rand();
-
             #draw from greturns (allowed to be > stomach size)
-            gutreturn = greturninfo[findall(x->x>fdraw,probline)[1]]; #kJ
-            gr[t] = gutreturn;
+            gutreturndraw = findall(x->x>fdraw,probline); #kJ
+            if length(gutreturndraw) == 0
+                # fdraw = rand();
+                #draw from greturns (allowed to be > stomach size)
+                # gutreturndraw = greturninfo[findall(x->x>fdraw,probline)[1]]; 
+                #kJ
+                #if fdraw is very large, nothing on probline will be > fdraw
+                gr[t] = maximum(greturninfo);
+            else
+                gr[t] = greturninfo[gutreturndraw[1]];
+            end
 
             #Change in stomach contents
-            deltagut = (gutreturn - cgut[t-1]*gutpass);
+            deltagut = (gr[t] - cgut[t-1]*gutpass);
             cgut[t] = minimum([maximum([cgut[t-1] + deltagut,0.0]),maxgut]);
 
             deltafat = (epsilon*cgut[t-1]*gutpass - field_cost - rest_cost);

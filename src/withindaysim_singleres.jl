@@ -66,6 +66,8 @@ function withindaysim_singleres(
     t_travel = 0.0;
     t_chew = 0.0;
     
+    # probability = Array{Float64}(undef,kmax+1).*0.0;
+    # kinfo = Array{Float64}(undef,kmax+1).*0.0;
     probability = SharedArray{Float64}(kmax+1);
     kinfo = SharedArray{Float64}(kmax+1);
     data = zeros(Float64,configurations);
@@ -73,79 +75,83 @@ function withindaysim_singleres(
     # Slow down organism if they have more choices
     # modvelocity = maximum([tweight[target],1/num_res])*velocity;
     
-    @sync @distributed for config = 1:configurations
+    # @sync @distributed 
+    for config = 1:configurations
         # Counters :: within configuration
-        number_of_successes = 0; # Each success is a bite
-        nearest_resource = 0;
-        t=0.0;
-        distance_to_resource = 0.0;
+        # number_of_successes = 0; # Each success is a bite
+        # nearest_resource = 0;
+        # t=0.0;
+        # distance_to_resource = 0.0;
         
-        # Energetic Returns!
-        gut = 0.0;
+        # # Energetic Returns!
+        # gut = 0.0;
+        GUT = Array{Float64}(undef,1);
+        let number_of_successes = 0, nearest_resource = 0, t=0.0, distance_to_resource = 0.0, gut = 0.0
         
-        while t < tmax_bout
+            while t < tmax_bout
 
-            # Draw distance to next resource
-            distance_to_resource = rand(Exponential(1.0/rand(gammadist)));
-                
-            #The forager will move towards the closest resource
-            ttravel = distance_to_resource/velocity; # distance / velcity = time
-            t += ttravel; # time
-            t_travel += ttravel; # time
+                # Draw distance to next resource
+                distance_to_resource = rand(Exponential(1.0/rand(gammadist)));
+                    
+                #The forager will move towards the closest resource
+                ttravel = distance_to_resource/velocity; # distance / velcity = time
+                t += ttravel; # time
+                t_travel += ttravel; # time
 
-            # # Digest while traveling
-            # # What has been digested?
-            # digested = gut*passrate*ttravel; #grams * 1/time * time = grams
-            # # Subtract this from the gut
-            # gut -= digested; # grams
-            # gut = maximum([gut,0.0]); # grams
-            # # Add this to the ereturns modified by digestibility epsilon
-            # ereturns += epsilon*digested; # grams
-            
-            # If the forager successfully reaches the resource
-            # Each resource is equal to 1 mouthful
-            if tmax_bout > (distance_to_resource/velocity)
-                number_of_successes += 1;
-                
-                # Time passes while chewing
-                t += tchew; #time
-                t_chew += tchew; #time
-
-                # Pass Mouth-Unit to Gut Total (boundary conditions in across-day sim)
-                # resgain is kJ per volume (mouth volume)
-                gut += beta; #grams/bite
-                
-                
-                # gut = minimum([gut,maxgut]); #grams
-
-                # # digest while chewing
+                # # Digest while traveling
                 # # What has been digested?
-                # digested = gut*passrate*tchew; # grams * 1/time * time = grams
+                # digested = gut*passrate*ttravel; #grams * 1/time * time = grams
                 # # Subtract this from the gut
-                # gut -= digested; #grams
-                # gut = maximum([gut,0.0]); #grams
+                # gut -= digested; # grams
+                # gut = maximum([gut,0.0]); # grams
                 # # Add this to the ereturns modified by digestibility epsilon
-                # ereturns += epsilon*digested; #grams
+                # ereturns += epsilon*digested; # grams
+                
+                # If the forager successfully reaches the resource
+                # Each resource is equal to 1 mouthful
+                if tmax_bout > (distance_to_resource/velocity)
+                    number_of_successes += 1;
+                    
+                    # Time passes while chewing
+                    t += tchew; #time
+                    t_chew += tchew; #time
+
+                    # Pass Mouth-Unit to Gut Total (boundary conditions in across-day sim)
+                    # resgain is kJ per volume (mouth volume)
+                    gut += beta; #grams/bite
+                    
+                    
+                    # gut = minimum([gut,maxgut]); #grams
+
+                    # # digest while chewing
+                    # # What has been digested?
+                    # digested = gut*passrate*tchew; # grams * 1/time * time = grams
+                    # # Subtract this from the gut
+                    # gut -= digested; #grams
+                    # gut = maximum([gut,0.0]); #grams
+                    # # Add this to the ereturns modified by digestibility epsilon
+                    # ereturns += epsilon*digested; #grams
+                end
+                
+                # # If you fill your stomach, wait until it is at xcapacity before starting again
+                # if gut == maxgut
+                #     t += twait; #time 
+                #     t_wait += twait; #time
+                #     digested = gut*passrate*twait; #grams * 1/time * time = grams
+                #     gut -= digested; #grams
+                #     gut = maximum([gut,0.0]); #grams
+                #     ereturns += epsilon*digested; #grams
+                # end 
             end
-            
-            # # If you fill your stomach, wait until it is at xcapacity before starting again
-            # if gut == maxgut
-            #     t += twait; #time 
-            #     t_wait += twait; #time
-            #     digested = gut*passrate*twait; #grams * 1/time * time = grams
-            #     gut -= digested; #grams
-            #     gut = maximum([gut,0.0]); #grams
-            #     ereturns += epsilon*digested; #grams
-            # end 
+            GUT[1] = gut;
         end
                 
         # total_kilojoules=dot((resgain),number_of_successes); #.*epsilon
         # avg_digestibility = epsilon .* (number_of_successes/sum(number_of_successes));
         
-        data[config] = gut * edensity; #grams * kJ/gram = kJ returns
-        
-        
+        data[config] = GUT[1] * edensity; #grams * kJ/gram = kJ returns
     end
+    
     datamin = minimum(data);
     datamax = maximum(data);
     if datamin!=datamax
