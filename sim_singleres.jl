@@ -18,12 +18,18 @@ edensity = 4000; # Resource energy density kJ/gram
 mass = 10; # KILOGRAMS
 teeth = "bunodont"; # bunodont, acute/obtuse lophs, lophs and non-flat, lophs and flat
 gut_type = "caecum"; # caecum, colon, non-rumen foregut, rumen foregut
-kmax = 50; # 50 in Sevilleta NOTE: I *think* controls bin size?
+kmax = 1000; # 50 in Sevilleta NOTE: I *think* controls bin size?
 tmax_bout = 6*60*60; # Set at 1/2 day (6) hours (43200 seconds)
 cyears = 0.5;
 configurations = 100000;
 
-gr, cgut, cfat, ginfo,gprob = acrossdaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,gut_type,kmax,tmax_bout,cyears,configurations);
+gprob, ginfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
+#This is a hack:
+gprob[findall(x->isnan(x)==true,gprob)].=0;
+R"plot($ginfo,$gprob,type='b')"
+
+
+gr, cgut, cfat, ginfo,gprob = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
 
 # R"plot($cfat,type='l')"
 
@@ -36,7 +42,7 @@ rfit = sum(cfat)/(maximum(cfat)*cyears*365)
 
 
 # SIMULATE ACROSS ZETA
-reps = 100;
+reps = 50;
 zetavec = collect(1.0:0.01:2.0);
 rfit = SharedArray{Float64}(length(zetavec));
 rho = 1;
@@ -57,9 +63,15 @@ configurations = 100000;
 
     rfitvec = Array{Float64}(undef,reps);
 
-    for r = 1:reps
-        gr, cgut, cfat, ginfo,gprob = acrossdaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,gut_type,kmax,tmax_bout,cyears,configurations);
+    gprob, ginfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
+    #This is a hack:
+    gprob[findall(x->isnan(x)==true,gprob)].=0;
 
+
+    for r = 1:reps
+        
+        gr, cgut, cfat, ginfo,gprob = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
+        gprob[findall(x->isnan(x)==true,gprob)].=0;
         rfitvec[r] = sum(cfat)/(maximum(cfat)*cyears*365)
     end
 

@@ -1,16 +1,10 @@
 function acrossdaysim_singleres(
-    rho,
-    alpha, # Resource dispersion
-    mu,  # Resource mean
-    zeta, # Resource variability scaling
+    gprob, 
+    ginfo,
     edensity, # Resource energy density kJ/gram
     mass, # KILOGRAMS
-    teeth, # bunodont, acute/obtuse lophs, lophs and non-flat, lophs and flat
     gut_type,
-    kmax, # 50 in Sevilleta NOTE: I *think* controls bin size?
-    tmax_bout, # Set at 12 hours (43200 seconds)
-    cyears, #consumer years
-    configurations)
+    cyears) #consumer years
 
     # rho = 1;
     # alpha = 2; # Resource dispersion
@@ -28,22 +22,22 @@ function acrossdaysim_singleres(
 
     # Daily Gut Return Distributions
     #first build within-day gut returns distributions (kJ)
-    greturnprob, greturninfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
+    # gprob, ginfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
 
     # If there is a bad within-day simulation, rerun until there is not!
-    let tictoc = 0
-        while any(isnan.(greturnprob)) == true
-            tictoc += 1;
-            greturnprob, greturninfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
-            if tictoc == 10
-                println("Problem within day")
-            end
-        end
-    end
+    # let tictoc = 0
+    #     while any(isnan.(gprob)) == true
+    #         tictoc += 1;
+    #         gprob, ginfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
+    #         if tictoc == 10
+    #             println("Problem within day")
+    #         end
+    #     end
+    # end
     
     # Visually check distributions
-    greturnmean = dot(greturnprob,greturninfo);
-    # R"plot($greturninfo,$greturnprob,type='b')"
+    greturnmean = dot(gprob,ginfo);
+    # R"plot($ginfo,$gprob,type='b')"
 
     
     # CALCULATE twait
@@ -93,7 +87,7 @@ function acrossdaysim_singleres(
     cgut[1] = maxgut;
     cfat[1] = maxfatstorage;
 
-    probline = cumsum(greturnprob);
+    probline = cumsum(gprob);
     probline = probline/maximum(probline);
     
     for t=2:daysincyears
@@ -106,12 +100,12 @@ function acrossdaysim_singleres(
             # if length(gutreturndraw) == 0
                 # fdraw = rand();
                 #draw from greturns (allowed to be > stomach size)
-                # gutreturndraw = greturninfo[findall(x->x>fdraw,probline)[1]]; 
+                # gutreturndraw = ginfo[findall(x->x>fdraw,probline)[1]]; 
                 #kJ
                 #if fdraw is very large, nothing on probline will be > fdraw
-                # gr[t] = maximum(greturninfo);
+                # gr[t] = maximum(ginfo);
             # else
-            gr[t] = greturninfo[gutreturndraw[1]];
+            gr[t] = ginfo[gutreturndraw[1]];
             # end
 
             #Change in stomach contents
@@ -127,7 +121,7 @@ function acrossdaysim_singleres(
     end
         
 
-    return gr, cgut, cfat, greturninfo, greturnprob
+    return gr, cgut, cfat, ginfo, gprob
 
 
 end
