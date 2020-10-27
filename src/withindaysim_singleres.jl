@@ -66,10 +66,10 @@ function withindaysim_singleres(
     t_travel = 0.0;
     t_chew = 0.0;
     
-    # probability = Array{Float64}(undef,kmax+1).*0.0;
-    # kinfo = Array{Float64}(undef,kmax+1).*0.0;
-    probability = SharedArray{Float64}(kmax+1);
-    kinfo = SharedArray{Float64}(kmax+1);
+    probability = Array{Float64}(undef,kmax+1).*0.0;
+    kinfo = Array{Float64}(undef,kmax+1).*0.0;
+    # probability = SharedArray{Float64}(kmax+1);
+    # kinfo = SharedArray{Float64}(kmax+1);
     data = zeros(Float64,configurations);
 
     # Slow down organism if they have more choices
@@ -86,15 +86,22 @@ function withindaysim_singleres(
         # # Energetic Returns!
         # gut = 0.0;
         GUT = Array{Float64}(undef,1);
-        let number_of_successes = 0, nearest_resource = 0, t=0.0, distance_to_resource = 0.0, gut = 0.0
+        let number_of_successes = 0, nearest_resource = 0, t=0.0, distance_to_resource = 0.0, gut = 0.0, tic = 0
         
             while t < tmax_bout
-
+                tic += 1
                 # Draw distance to next resource
                 distance_to_resource = rand(Exponential(1.0/rand(gammadist)));
                     
                 #The forager will move towards the closest resource
                 ttravel = distance_to_resource/velocity; # distance / velcity = time
+                
+                # to avoid zero food encounters, make the first or second draw a shorter distance!
+                if tic == 1 || tic == 2
+                    if ttravel > (tmax_bout*0.9);
+                        ttravel = tmax_bout/10;
+                    end
+                end
                 t += ttravel; # time
                 t_travel += ttravel; # time
 

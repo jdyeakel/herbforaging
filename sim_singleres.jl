@@ -7,6 +7,7 @@ using Distributed
 @everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/trait_and_rate_functions.jl");
 @everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/withindaysim_singleres.jl");
 @everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/acrossdaysim_singleres.jl");
+@everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/smartpath.jl");
 
 # TESTRUN
 rho = 1;
@@ -28,7 +29,7 @@ gr, cgut, cfat, ginfo,gprob = acrossdaysim_singleres(rho,alpha,mu,zeta,edensity,
 
 R"plot($ginfo,$gprob,type='b')"
 
-mean(cfat)
+# Possible fitness measure
 # Integrated energetic state / total possible
 rfit = sum(cfat)/(maximum(cfat)*cyears*365)
 
@@ -36,8 +37,8 @@ rfit = sum(cfat)/(maximum(cfat)*cyears*365)
 
 # SIMULATE ACROSS ZETA
 reps = 100;
-zetavec = collect(1.0:0.1:2.0);
-rfit = Array{Float64}(undef,length(zetavec));
+zetavec = collect(1.0:0.01:2.0);
+rfit = SharedArray{Float64}(length(zetavec));
 rho = 1;
 alpha = 2; # Resource dispersion
 mu = 0.00000000001;  # Resource mean
@@ -51,7 +52,7 @@ tmax_bout = 6*60*60; # Set at 1/2 day (6) hours (43200 seconds)
 cyears = 1;
 configurations = 100000;
 
-for i=1:length(zetavec)
+@time @sync @distributed for i=1:length(zetavec)
     zeta = zetavec[i];
 
     rfitvec = Array{Float64}(undef,reps);
@@ -66,11 +67,16 @@ for i=1:length(zetavec)
     # cvfat[i] = std(cfat)/mean(cfat);
     rfit[i] = mean(rfitvec);
 
-    # percentdone = floor((i/length(zetavec))*100);
-    # if mod(percentdone,10) == 0
-    #     println(percentdone)
-    # end
+    percentdone = floor((i/length(zetavec))*100);
+    if mod(percentdone,10) == 0
+        println(percentdone)
+    end
 end
 
-R"plot($zetavec,$rfit,pch=16)"
+namespace = smartpath("figures/fitness_v_zeta.pdf")
+R"""
+pdf($namespace,width=6,height=5)
+plot($zetavec,$rfit,pch=16,xlab='Zeta',ylab='Integrated relative fitness')
+dev.off()
+"""
 

@@ -29,6 +29,17 @@ function acrossdaysim_singleres(
     # Daily Gut Return Distributions
     #first build within-day gut returns distributions (kJ)
     greturnprob, greturninfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
+
+    # If there is a bad within-day simulation, rerun until there is not!
+    let tictoc = 0
+        while any(isnan.(greturnprob)) == true
+            tictoc += 1;
+            greturnprob, greturninfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
+            if tictoc == 10
+                println("Problem within day")
+            end
+        end
+    end
     
     # Visually check distributions
     greturnmean = dot(greturnprob,greturninfo);
@@ -91,16 +102,17 @@ function acrossdaysim_singleres(
             fdraw = rand();
             #draw from greturns (allowed to be > stomach size)
             gutreturndraw = findall(x->x>fdraw,probline); #kJ
-            if length(gutreturndraw) == 0
+
+            # if length(gutreturndraw) == 0
                 # fdraw = rand();
                 #draw from greturns (allowed to be > stomach size)
                 # gutreturndraw = greturninfo[findall(x->x>fdraw,probline)[1]]; 
                 #kJ
                 #if fdraw is very large, nothing on probline will be > fdraw
-                gr[t] = maximum(greturninfo);
-            else
-                gr[t] = greturninfo[gutreturndraw[1]];
-            end
+                # gr[t] = maximum(greturninfo);
+            # else
+            gr[t] = greturninfo[gutreturndraw[1]];
+            # end
 
             #Change in stomach contents
             deltagut = (gr[t] - cgut[t-1]*gutpass);
@@ -113,6 +125,7 @@ function acrossdaysim_singleres(
             cfat[t] = minimum([maximum([cfat[t-1] + deltafat,0.0]),maxfatstorage]);
         end
     end
+        
 
     return gr, cgut, cfat, greturninfo, greturnprob
 
