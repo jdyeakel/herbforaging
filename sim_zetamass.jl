@@ -1,13 +1,22 @@
-using Distributed
-@everywhere using SharedArrays
-@everywhere using Distributions
-@everywhere using RCall
-@everywhere using LinearAlgebra
+if homedir() == "/home/z840"
+    loadfunc = include("$(homedir())/herbforaging/src/loadfuncs.jl");
+else
+    loadfunc = include("$(homedir())/Dropbox/PostDoc/2020_herbforaging/src/loadfuncs.jl");
+end
 
-@everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/trait_and_rate_functions.jl");
-@everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/withindaysim_singleres.jl");
-@everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/acrossdaysim_singleres.jl");
-@everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/smartpath.jl");
+
+
+
+# using Distributed
+# @everywhere using SharedArrays
+# @everywhere using Distributions
+# @everywhere using RCall
+# @everywhere using LinearAlgebra
+
+# @everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/trait_and_rate_functions.jl");
+# @everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/withindaysim_singleres.jl");
+# @everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/acrossdaysim_singleres.jl");
+# @everywhere include("/home/jdyeakel/Dropbox/PostDoc/2020_herbforaging/src/smartpath.jl");
 
 
 # SIMULATE ACROSS ZETA

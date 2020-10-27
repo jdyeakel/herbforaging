@@ -5,7 +5,7 @@ function smartpath(filename::String,indices::Array{Int64}=[0])
     
     if indices[1] == 0
         if homedir() == "/home/z840"
-            namespace = string("$(homedir())/2020_herbforaging/",filename_cut,extension);
+            namespace = string("$(homedir())/herbforaging/",filename_cut,extension);
         else
             # namespace = string("$(homedir())/Dropbox/Postdoc/2014_Lego/Enigma/",filename_cut,extension);
             namespace = string("$(homedir())/Dropbox/PostDoc/2020_herbforaging/",filename_cut,extension);
@@ -20,7 +20,7 @@ function smartpath(filename::String,indices::Array{Int64}=[0])
         end
         
         if homedir() == "/home/z840"
-            namespace = string("$(homedir())/2020_herbforaging/",filename_cut,indexstring,extension);
+            namespace = string("$(homedir())/herbforaging/",filename_cut,indexstring,extension);
         else
             # namespace = string("$(homedir())/Dropbox/Postdoc/2014_Lego/Enigma/",filename_cut,indexstring,extension);
             namespace = string("$(homedir())/Dropbox/PostDoc/2020_herbforaging/",filename_cut,indexstring,extension);
