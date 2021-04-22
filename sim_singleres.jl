@@ -20,7 +20,7 @@ teeth = "bunodont"; # bunodont, acute/obtuse lophs, lophs and non-flat, lophs an
 gut_type = "caecum"; # caecum, colon, non-rumen foregut, rumen foregut
 kmax = 1000; # 50 in Sevilleta NOTE: I *think* controls bin size?
 tmax_bout = 6*60*60; # Set at 1/2 day (6) hours (43200 seconds)
-cyears = 0.5;
+cyears = 1;
 configurations = 100000;
 
 gprob, ginfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
@@ -29,7 +29,7 @@ gprob[findall(x->isnan(x)==true,gprob)].=0;
 R"plot($ginfo,$gprob,type='b')"
 
 
-gr, cgut, cfat, ginfo,gprob = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
+gr, cgut, cfat = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
 
 # R"plot($cfat,type='l')"
 
@@ -69,9 +69,7 @@ configurations = 100000;
 
 
     for r = 1:reps
-        
-        gr, cgut, cfat, ginfo,gprob = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
-        gprob[findall(x->isnan(x)==true,gprob)].=0;
+        gr, cgut, cfat = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
         rfitvec[r] = sum(cfat)/(maximum(cfat)*cyears*365)
     end
 

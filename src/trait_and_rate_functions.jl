@@ -351,3 +351,17 @@ function indperarea(mass)
     popdensity = (0.0116)*massg^-0.776;
     return popdensity
 end
+
+# # Bite chew time allometry
+# massvec = [10^i for i=collect(0:0.1:5)];
+# teeth = "bunodont";
+# betavec = bite_size_allo.(massvec);
+# chewratevec = chew_allo.(massvec,teeth);
+# tchewgramvec = 1 ./ chewratevec;
+# tchewvec = tchewgramvec .* betavec
+# namespace = smartpath("figures/tchew_allometry.pdf")
+# R"""
+# pdf($namespace,width=4,height=4)
+# plot($massvec,$tchewvec,type='l',lwd=2,xlab='Mass (kg)',ylab='Bite chew time (s)')
+# dev.off()
+# """

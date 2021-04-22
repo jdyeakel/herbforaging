@@ -7,7 +7,7 @@ function withindaysim_singleres(
     mass, # KILOGRAMS
     teeth, # bunodont, acute/obtuse lophs, lophs and non-flat, lophs and flat
     kmax, # 50 in Sevilleta NOTE: I *think* controls bin size?
-    tmax_bout, # Set at 12 hours (43200 seconds)
+    tmax_bout,
     configurations
     )
 
@@ -77,6 +77,7 @@ function withindaysim_singleres(
     
             t_travel = 0.0;
             t_chew = 0.0;
+            bites = 0;
             
             probability = probability .* 0.0;
             kinfo = kinfo .* 0.0;
@@ -85,7 +86,8 @@ function withindaysim_singleres(
             # Slow down organism if they have more choices
             # modvelocity = maximum([tweight[target],1/num_res])*velocity;
 
-            
+            # bitesperday = Array{Int64}(undef,configurations);
+
             # @sync @distributed 
             for config = 1:configurations
                 # Counters :: within configuration
@@ -97,12 +99,17 @@ function withindaysim_singleres(
                 # # Energetic Returns!
                 # gut = 0.0;
                 GUT = Array{Float64}(undef,1);
+                # BITES = Array{Int64}(undef,1);
                 let number_of_successes = 0, nearest_resource = 0, t=0.0, distance_to_resource = 0.0, gut = 0.0, tic = 0
                 
                     while t < tmax_bout
                         tic += 1
+
+
                         # Draw distance to next resource
-                        distance_to_resource = rand(Exponential(1.0/rand(gammadist)));
+                        # First draw encounter rate
+                        rg = rand(gammadist);
+                        distance_to_resource = rand(Exponential(1.0/rg));
                             
                         #The forager will move towards the closest resource
                         ttravel = distance_to_resource/velocity; # distance / velcity = time
@@ -115,7 +122,7 @@ function withindaysim_singleres(
                         end
                         t += ttravel; # time
                         t_travel += ttravel; # time
-
+                        
                         # # Digest while traveling
                         # # What has been digested?
                         # digested = gut*passrate*ttravel; #grams * 1/time * time = grams
@@ -127,7 +134,7 @@ function withindaysim_singleres(
                         
                         # If the forager successfully reaches the resource
                         # Each resource is equal to 1 mouthful
-                        if tmax_bout > (distance_to_resource/velocity)
+                        if tmax_bout > (t + ttravel)
                             number_of_successes += 1;
                             
                             # Time passes while chewing
@@ -137,7 +144,7 @@ function withindaysim_singleres(
                             # Pass Mouth-Unit to Gut Total (boundary conditions in across-day sim)
                             # resgain is kJ per volume (mouth volume)
                             gut += beta; #grams/bite
-                            
+                            bites += 1;
                             
                             # gut = minimum([gut,maxgut]); #grams
 
@@ -150,6 +157,7 @@ function withindaysim_singleres(
                             # # Add this to the ereturns modified by digestibility epsilon
                             # ereturns += epsilon*digested; #grams
                         end
+
                         
                         # # If you fill your stomach, wait until it is at xcapacity before starting again
                         # if gut == maxgut
@@ -162,14 +170,15 @@ function withindaysim_singleres(
                         # end 
                     end
                     GUT[1] = gut;
+                    # BITES[1] = bites;
                 end
                         
                 # total_kilojoules=dot((resgain),number_of_successes); #.*epsilon
                 # avg_digestibility = epsilon .* (number_of_successes/sum(number_of_successes));
-                
+                # bitesperday[config] = BITES[1];
                 data[config] = GUT[1] * edensity; #grams * kJ/gram = kJ returns
             end
-            
+            # mbitesperday = mean(bitesperday);
             datamin = minimum(data);
             datamax = maximum(data);
             if datamin!=datamax
@@ -204,9 +213,10 @@ function withindaysim_singleres(
     t_travel /= configurations;
     t_chew /= configurations;
     # t_wait /= configurations;
+    bites /= configurations;
     
     # Can tuples be > 2?
-    tout = tuple(t_travel,t_chew);
+    tout = tuple(t_travel,t_chew,bites);
     
     
     #note: probability matrix should have dims (kmax)

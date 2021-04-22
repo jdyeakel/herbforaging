@@ -22,10 +22,10 @@ end
 # SIMULATE ACROSS ZETA
 reps = 50;
 zetavec = collect(1.0:0.01:2.0);
-massexpvec = collect(1:0.1:6);
+massexpvec = collect(1:0.1:4); #Remember this is in KG!
 rfit = SharedArray{Float64}(length(zetavec)*length(massexpvec));
-rho = 0.1;
-alpha = 2; # Resource dispersion
+rho = 0.01;
+alpha = 3; # Resource dispersion
 mu = 0.00000000001;  # Resource mean
 zeta = 1; # Resource variability scaling
 edensity = 4000; # Resource energy density kJ/gram
