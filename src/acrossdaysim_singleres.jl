@@ -57,12 +57,14 @@ function acrossdaysim_singleres(
     gutpass = passrate * secday * edensity; # grams/s * s/day * kJ/gram = kJ/day
 
     # Metabolic loss per day
-    maxfatstorage, cost_basalrate, cost_fieldrate = find_metabolism(mass);
+    activehrs = 12;
+    maxfatstorage, cost_basalrate, cost_fieldrate = find_metabolism(mass,activehrs);
+    #maxfatstorage = kJ
+    #costs = kJ/day
 
     #Active time
-    activehrs = 12;
-    field_cost = cost_fieldrate * (activehrs*60*60);    #kJ/s * seconds = KJ
-    rest_cost = cost_basalrate * ((24 - activehrs)*60*60); #KJ/s * seconds = KJ
+    field_cost = cost_fieldrate;    #kJ/day
+    rest_cost = cost_basalrate; #KJ/day
 
     # How long does it take to empty gut from maxgut to 1/2 maxgut?
     # twait = (maxgut/2)*(1/passrate); #grams * s/grams = seconds
@@ -91,11 +93,25 @@ function acrossdaysim_singleres(
     probline = probline/maximum(probline);
     
     for t=2:daysincyears
+
+
         if cfat[t-1] > 0.0
-            #Draw daily return
-            fdraw = rand();
-            #draw from greturns (allowed to be > stomach size)
-            gutreturndraw = findall(x->x>fdraw,probline); #kJ
+
+             # We could build in environmental stress here
+            # (Prevalence of Good <-> Bad days w/ autocorrelation)
+            gooddaydraw = rand();
+
+            if gooddaydraw < 1
+                #good day
+                #Draw daily return
+                fdraw = rand();
+                #draw from greturns (allowed to be > stomach size)
+                gutreturndraw = findall(x->x>fdraw,probline); #kJ
+                gutreturn = ginfo[gutreturndraw[1]];
+            else
+                #bad day
+                gutreturn = 0.0;
+            end
 
             # if length(gutreturndraw) == 0
                 # fdraw = rand();
@@ -105,7 +121,7 @@ function acrossdaysim_singleres(
                 #if fdraw is very large, nothing on probline will be > fdraw
                 # gr[t] = maximum(ginfo);
             # else
-            gr[t] = ginfo[gutreturndraw[1]];
+            gr[t] = gutreturn;
             # end
 
             #Change in stomach contents

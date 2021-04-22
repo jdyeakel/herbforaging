@@ -60,7 +60,14 @@ function withindaysim_singleres(
             # NOTE: BUILD IN ZETA SCALING!
 
             #Consumer population density: individuals/m^2
-            n = indperarea(mass);
+            ndensity = indperarea(mass); #individuals/m^2
+            # n=1; #Need to think harder about how n -> mprime
+
+            forageseconds = copy(tmax_bout); #seconds
+            homerangediameter = velocity*forageseconds; #meters
+            homerangearea = pi*(homerangediameter/2)^2; #meters^2
+            n = ndensity*homerangearea; #inds/area
+
 
             # mu*(1/beta) = resource density = bites/m^2
             # rho * mu * (1/beta) = bite encounters/m^2 ~ bite encounter rate
@@ -114,7 +121,7 @@ function withindaysim_singleres(
                         #The forager will move towards the closest resource
                         ttravel = distance_to_resource/velocity; # distance / velcity = time
                         
-                        # to avoid zero food encounters, make the first or second draw a shorter distance!
+                        # to avoid zero food encounters, FORCE the first or second draw a shorter distance!
                         if tic == 1 || tic == 2
                             if ttravel > (tmax_bout*0.9);
                                 ttravel = tmax_bout/10;
@@ -134,7 +141,7 @@ function withindaysim_singleres(
                         
                         # If the forager successfully reaches the resource
                         # Each resource is equal to 1 mouthful
-                        if tmax_bout > (t + ttravel)
+                        if (t + ttravel) < tmax_bout
                             number_of_successes += 1;
                             
                             # Time passes while chewing

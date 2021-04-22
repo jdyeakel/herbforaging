@@ -11,17 +11,18 @@ using UnicodePlots
 @everywhere include("$(homedir())/Dropbox/PostDoc/2020_herbforaging/src/smartpath.jl");
 
 # TESTRUN
-rho = 100;
+rho = 0.01;
 alpha = 2; # Resource dispersion
-mu = 0.00000000001;  # Resource mean
+mu = 1;  # Resource mean
 zeta = 1; # Resource variability scaling
-edensity = 4000; # Resource energy density kJ/gram
+edensity = 18.2; # Resource energy density kJ/gram (from YKR)
 mass = 10000; # KILOGRAMS
 teeth = "bunodont"; # bunodont, acute/obtuse lophs, lophs and non-flat, lophs and flat
 gut_type = "caecum"; # caecum, colon, non-rumen foregut, rumen foregut
-kmax = 1000; # 50 in Sevilleta NOTE: I *think* controls bin size?
-tmax_bout = 6*60*60; # Set at 1/2 day (6) hours (43200 seconds)
-cyears = 1;
+kmax = 100; # 50 in Sevilleta NOTE: I *think* controls bin size?
+foragehours = 2;
+tmax_bout = foragehours*60*60; # Set at 1/2 day (6) hours
+cyears = 10;
 configurations = 100000;
 
 gprob, ginfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
@@ -31,10 +32,8 @@ R"plot($ginfo,$gprob,type='b')"
 
 
 gr, cgut, cfat = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
-
 R"plot($cfat,type='l')"
 
-R"plot($ginfo,$gprob,type='b')"
 
 # Possible fitness measure
 # Integrated energetic state / total possible

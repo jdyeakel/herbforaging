@@ -294,12 +294,14 @@ end
 
 
 
-function find_metabolism(mass)
+function find_metabolism(mass,activehours)
     # takes a terrestrial mammal body mass (kg), returns storage masses and metabolic rates
     # find a source for this
 
     mass_g = mass * 1000; #[kj]->[g]
-# function for setting initial energy and metabolic costs from body mass
+    
+    # function for setting initial energy and metabolic costs from body mass
+    
     #Joules per gram
     joules_per_gram = 20000; #varies between 7000 to 36000 [int] [J/g]
     kjoules_per_gram = joules_per_gram / 1000;   # [int/int=int] [kJ/g]
@@ -337,8 +339,22 @@ function find_metabolism(mass)
     #cost_basal = cost_basal_hr / 60 / 60;   # [float], [kJ/s]
     #cost_field = cost_field_hr / 60 / 60;   # [float], [kJ/s]
     
-    cost_basal =  3.4/1000 * mass^-0.75 # j/s -> kj/s
-    cost_field = 1.54 * cost_basal # kj/s
+    # cost_basal =  3.4/1000 * mass^-0.75 # j/s -> kj/s
+    # cost_field = 1.54 * cost_basal # kj/s
+
+    #Metabolic costs from Sevilleta papers
+    #These euations are for mass in grams, hence (mass*1000)
+     #Metabolic constants for the basal and field metabolic rate
+    b0_bmr = 0.018; #watts g^-0.75
+    b0_fmr = 0.047; #watts g^-0.75
+    nonactivehours = 24-activehours;
+    cwh_df = (b0_bmr*((mass*1000)^0.75))*activehours + (b0_bmr*((mass*1000)^0.75))*nonactivehours; #watt*hour
+    cwh_f = (b0_fmr*((mass*1000)^0.75))*activehours + (b0_bmr*((mass*1000)^0.75))*nonactivehours; #watt*hour
+    #Convert to kiloJoules
+    whrkJ = 3.6;
+
+    cost_basal = cwh_df*whrkJ; #kJ per day
+    cost_field = cwh_f*whrkJ; #kJ per day
 
     return storage_kj, cost_basal, cost_field
 
@@ -346,9 +362,9 @@ end
 
 function indperarea(mass)
     #Enter mass in kg
-    #Conver to grams
+    #Convert to grams
     massg = mass*1000;
-    popdensity = (0.0116)*massg^-0.776;
+    popdensity = (0.0116)*massg^-0.776; #inds/area (from Damuth)
     return popdensity
 end
 
