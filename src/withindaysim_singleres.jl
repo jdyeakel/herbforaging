@@ -80,7 +80,7 @@ function withindaysim_singleres(
             #Define Gamma Distribution for resource availability
             gammadist = Gamma(alphaprime,mprime/alphaprime); #mean = alpha * m/alpha
 
-    
+        
     
             t_travel = 0.0;
             t_chew = 0.0;

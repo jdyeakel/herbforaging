@@ -11,19 +11,19 @@ using UnicodePlots
 @everywhere include("$(homedir())/Dropbox/PostDoc/2020_herbforaging/src/smartpath.jl");
 
 # TESTRUN
-rho = 0.01;
-alpha = 2; # Resource dispersion
+rho = 0.04;
+alpha = 100; # Resource dispersion
 mu = 1;  # Resource mean
-zeta = 1; # Resource variability scaling
+zeta = 2; # Resource variability scaling
 edensity = 18.2; # Resource energy density kJ/gram (from YKR)
-mass = 10000; # KILOGRAMS
+mass = 1000; # KILOGRAMS
 teeth = "bunodont"; # bunodont, acute/obtuse lophs, lophs and non-flat, lophs and flat
 gut_type = "caecum"; # caecum, colon, non-rumen foregut, rumen foregut
 kmax = 100; # 50 in Sevilleta NOTE: I *think* controls bin size?
 foragehours = 2;
 tmax_bout = foragehours*60*60; # Set at 1/2 day (6) hours
 cyears = 10;
-configurations = 100000;
+configurations = 10000;
 
 gprob, ginfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
 #This is a hack:
