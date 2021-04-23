@@ -136,8 +136,9 @@ function acrossdaysim_singleres(
         end
     end
         
+    ctraits = tuple(maxfatstorage)
 
-    return gr, cgut, cfat
+    return gr, cgut, cfat, ctraits
 
 
 end

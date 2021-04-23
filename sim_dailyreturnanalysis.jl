@@ -10,19 +10,20 @@ using UnicodePlots
 @everywhere include("$(homedir())/Dropbox/PostDoc/2020_herbforaging/src/acrossdaysim_singleres.jl");
 @everywhere include("$(homedir())/Dropbox/PostDoc/2020_herbforaging/src/smartpath.jl");
 
+
 # TESTRUN
-rho = 0.04;
-alpha = 100; # Resource dispersion
+rho = 0.52; #0.04;
+alpha = 1000; # Resource dispersion
 mu = 1;  # Resource mean
 zeta = 2; # Resource variability scaling
 edensity = 18.2; # Resource energy density kJ/gram (from YKR)
-mass = 1000; # KILOGRAMS
+mass = 1; # KILOGRAMS
 teeth = "bunodont"; # bunodont, acute/obtuse lophs, lophs and non-flat, lophs and flat
 gut_type = "caecum"; # caecum, colon, non-rumen foregut, rumen foregut
 kmax = 100; # 50 in Sevilleta NOTE: I *think* controls bin size?
 foragehours = 2;
 tmax_bout = foragehours*60*60; # Set at 1/2 day (6) hours
-cyears = 10;
+cyears = 1;
 configurations = 10000;
 
 gprob, ginfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
@@ -31,8 +32,8 @@ gprob[findall(x->isnan(x)==true,gprob)].=0;
 R"plot($ginfo,$gprob,type='b')"
 
 
-gr, cgut, cfat = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
-R"plot($cfat,type='l')"
+gr, cgut, cfat, ctraits = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
+R"plot($(cfat/ctraits[1]),type='l')"
 
 
 # Possible fitness measure
