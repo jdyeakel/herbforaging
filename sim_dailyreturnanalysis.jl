@@ -1,29 +1,24 @@
-using Distributed
-using UnicodePlots
-@everywhere using SharedArrays
-@everywhere using Distributions
-@everywhere using RCall
-@everywhere using LinearAlgebra
+if homedir() == "/home/z840"
+    loadfunc = include("$(homedir())/herbforaging/src/loadfuncs.jl");
+else
+    loadfunc = include("$(homedir())/Dropbox/PostDoc/2020_herbforaging/src/loadfuncs.jl");
+end
 
-@everywhere include("$(homedir())/Dropbox/PostDoc/2020_herbforaging/src/trait_and_rate_functions.jl");
-@everywhere include("$(homedir())/Dropbox/PostDoc/2020_herbforaging/src/withindaysim_singleres.jl");
-@everywhere include("$(homedir())/Dropbox/PostDoc/2020_herbforaging/src/acrossdaysim_singleres.jl");
-@everywhere include("$(homedir())/Dropbox/PostDoc/2020_herbforaging/src/smartpath.jl");
 
 
 # TESTRUN
-rho = 0.52; #0.04;
+rho = 0.033; #0.04;
 alpha = 1000; # Resource dispersion
 mu = 1;  # Resource mean
 zeta = 2; # Resource variability scaling
 edensity = 18.2; # Resource energy density kJ/gram (from YKR)
-mass = 1; # KILOGRAMS
+mass = 1000; # KILOGRAMS
 teeth = "bunodont"; # bunodont, acute/obtuse lophs, lophs and non-flat, lophs and flat
 gut_type = "caecum"; # caecum, colon, non-rumen foregut, rumen foregut
 kmax = 100; # 50 in Sevilleta NOTE: I *think* controls bin size?
 foragehours = 2;
 tmax_bout = foragehours*60*60; # Set at 1/2 day (6) hours
-cyears = 1;
+cyears = 5;
 configurations = 10000;
 
 gprob, ginfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
@@ -33,7 +28,12 @@ R"plot($ginfo,$gprob,type='b')"
 
 
 gr, cgut, cfat, ctraits = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
-R"plot($(cfat/ctraits[1]),type='l')"
+namespace = smartpath("figures/trajectory2_M1000KG.pdf")
+R"""
+pdf($namespace,width=6,height=5)
+plot($(cfat/ctraits[1]),type='l',xlab = 'Days', ylab='Relative fat reserves')
+dev.off()
+"""
 
 
 # Possible fitness measure

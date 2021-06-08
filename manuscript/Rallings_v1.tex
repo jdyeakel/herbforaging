@@ -1,0 +1,145 @@
+\documentclass[onecolumn,preprintnumbers,amsmath,amssymb,superscriptaddress]{revtex4}
+%\usepackage[pdftex]{graphicx}
+
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage{float}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+\usepackage{anyfontsize}
+
+
+%\usepackage{epstopdf}
+%\usepackage{array}
+%\usepackage{tabularx}
+%\usepackage{multirow}
+\usepackage{color}
+%\usepackage{multibox}
+%\usepackage{rotating}
+%\usepackage{lineno}
+%\usepackage[left]{lineno}
+%\usepackage[comma,sort&compress]{natbib}
+%\usepackage{authblk}
+%\usepackage{multicol}
+
+%\bibliographystyle{ieeetr}
+
+
+%\linenumbers
+%\setlength\linenumbersep{3pt}
+
+\begin{document}
+
+\author{Taran Rallings} \affiliation{School of Natural Sciences, University
+  of California, Merced, Merced, CA 95340, USA}
+
+\author{Justin D. Yeakel} \affiliation{School of Natural Sciences, University
+  of California, Merced, Merced, CA 95340, USA}
+
+
+\title{Untitled herbivore foraging project}
+
+
+
+\begin{abstract}
+abstract goes here
+\end{abstract}
+
+\maketitle
+
+\section*{Introduction}
+
+Amazing words. The best words.
+
+
+
+\section*{Model Description}
+
+We examine the foraging dynamics of herbivore consumers feeding on a single resource distributed across an implicit landscape.
+The time spent finding, acquiring, and processing this resource is the primary constraint of the foraging dynamic, and these timescales are assumed to change by the tandem effects of both herbivore and resource traits.
+Given a set of consumer and resource traits, the timescales of finding, acquiring, and processing the resource changes, which impacts the quantity of resource that the herbivore is able to consume within a day.
+Consumer traits consist of allometric rates that are a function of consumer body mass $M$ (Kg), tooth shape, and gut type.
+We track two principle compartments for the herbivore consumer that change across days: the amount of energy (kJ) stored in its stomach $X(t)$ and endogenous (fat) storage $Y(t)$, where $t$ is in days.
+We maintain uppercase notation for random variables and lowercase notation for specific values of all stochastic quantities.
+
+%Across day dynamics
+The consumer's gut storage $X(t)$ increases by the amount gained within a daily foraging bout $G$ and lost due to passage through the gut $p(M)$.
+Gut storage is bound by the consumer's maximum storage, which is a function of consumer mass $X(t) = x_{\rm max}(M)$.
+The consumer's fat storage $Y(t)$ increases by the amount passed from the gut and converted to fat with efficiency $\epsilon$, and lost via metabolic expenditure $c(M)$.
+Fat storage is similarly bound by the consumer's maximum storage $Y(t) = y_{\rm max}(M)$.
+The equations governing changes to the consumer's energetic state are thus
+\begin{align}
+    X(t+1) &= X(t) + \left(G - p(M)X(t)\right),~{\rm where}~X(t)\in[0,X_{\rm max}] \nonumber \\ 
+    Y(t+1) &= Y(t) + \left(\epsilon p(M)X(t) - c(M)\right),~{\rm where}~Y(t)\in[0,Y_{\rm max}], \nonumber
+\end{align}
+where we assume that the consumer is dead when its fat reserves have been completely metabolized, such that $Y(t) = 0$. 
+
+% Within day dynamics
+The within-day activity of a consumer is simplified to consist of the herbivore traveling from one resource interaction to the other over the course of the foraging bout.
+The day ends when the time within the bout is spent, where the energy obtained is passed to its gut, and the energy spent is metabolized from its fat stores.
+The amount of resources (kJ) passed from the herbivore's mouth to its gut within a day's foraging activity $G = g$ is a stochastic quantity that depends on the amount of time spent \emph{i}) processing found resources with its teeth, and \emph{ii}) traveling between resources, bound by the maximum hours within a day that the consumer spends foraging $h_{\rm bout}$.
+Each consumer-resource encounter is scaled to a single bite, where the time spent processing a bite is directly proportional to bite size $\beta$ (grams/bite) and inversely proportional to the bite rate $r_{\rm bite}$ (grams/sec), given by $\tau_{\rm bite} = \beta r_{\rm bite}^{-1}$ (s/bite).
+Importantly, bite size scales with consumer mass $M$, whereas bite rate scales with both $M$ and tooth type.
+
+The majority of the consumer's foraging time is spent traveling between encounters (bites) within the implicit spatial landscape.
+Travel time changes with both resource density $\mu$ (grams/meter${}^2$) and dispersion $\alpha$.
+If the resource is densely distributed (high $\mu$), the travel time between bites will be short, and if the resource is sparse (low $\mu$) the travel time will be long.
+Moreover if the resource is evenly distributed across the landscape (high $\alpha$), there will be less variability in consumer travel time, whereas if the resource is patchily distributed (low $\alpha$), travel time variance will increase.
+Scaled to consumer bite size, the mean bites/meter${}^2$ is $m = \mu \beta^{-1}$.
+We assume that encounter rate $\Lambda = \lambda$ scales in proportion to $m$, such that $\Lambda \propto {\rm Gamma}(\alpha, m/\alpha)$, such that the mean encounter rate is ${\rm E}\{\Lambda\} = m$ with variance ${\rm V}\{\Lambda\}=m^2/\alpha$.
+Resources are assumed to be shared by local members of the consumer's population.
+Rather than model competition explicitly, we account for competitive demand by partitioning available resources by number of local competitors $n$.
+As such the post-competition encounter rate $\Lambda^\prime = \lambda^\prime$ is modified as ${\rm E}\{\Lambda^\prime\}= m/n$ and ${\rm V}\{\Lambda\prime\}=m^2 \alpha^{-1} n^{-\zeta}$, such that resource variability and the associated encounter rates follow a power law.
+As the number of local competitors $n$ increases, resource availability decreases. 
+Larger organisms have fewer conspecific competitors due to lower population densities. 
+As such, $\zeta$ determines how the resource variance experienced by an individual consumer scales with the population density.
+For example, to a rodent consumer a resource such as grass may appear more patchily distributed, whereas to an elephant it appears evenly distributed ($\zeta \approx 1$).
+In contrast, resources that are more stand-alone such as savanna trees are similarly patch to both small and large consumers ($\zeta \approx 2)$.
+
+
+The distance between resource encounters $D=d$ is then given by $D \propto {\rm Exponental}(1/\Lambda^{\prime})$, such that the distance mean and variance is given by
+\begin{align}
+    {\rm E}\{D\} &= \frac{\alpha^\prime}{m^\prime(\alpha^\prime - 1)} \nonumber \\
+    {\rm V}\{D\} &= \frac{\alpha^{\prime 3}}{m^{\prime 2}(\alpha^\prime - 1)^2(\alpha^\prime -2)},
+\end{align}
+where $m^\prime = m/n$ and $\alpha^\prime = \alpha/n^\zeta$.
+
+
+
+where $\rho$ is a dimensionless scalar.
+
+
+In addition to resource density and dispersion, we consider the effects of consumer body size on resource variability.
+
+
+% We first assume that
+% the mean and variance of resources, μ and σ 2 , respectively, are
+% partitioned among n members of a population per area, as μ ind =
+% 2
+% μ/n and σ ind
+% = σ 2 /n ζ , where resource variance follows a power
+% law (36). As the number of individuals per area n increases, the
+% amount of area foraged by an individual 1/n decreases.
+
+
+The patchiness of resources will scale differently with $M$, depending on resource type.
+For example, to a rodent consumer a resource such as grass may appear more patchily distributed, whereas to an elephant it appears evenly distributed.
+In contrast, resources that are more stand-alone such as savanna trees are similarly patch to both small and large consumers.
+We capture differences in the scaling of resource variability with the parameter $\zeta$.
+
+
+%Distance and velocity
+
+% Resource availability
+Resource traits consist of mean density $\mu$, spatial dispersion $\alpha$, and the degree to which spatial variance scales with consumer body size $\zeta$.
+
+$G = \eta \beta S$ where $S=s$ is the number of successful encounters (bites) within a day, $\eta$ is the energy density of the resource, and $\beta$, as previously detailed, is the consumer bite capacity (grams/bite).
+
+
+\end{document}

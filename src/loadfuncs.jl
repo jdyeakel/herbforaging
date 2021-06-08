@@ -1,4 +1,5 @@
 using Distributed
+using UnicodePlots
 
 @everywhere using Distributions
 @everywhere using RCall
