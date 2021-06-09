@@ -101,8 +101,8 @@ dev.off()
 zetavec = collect(1:0.1:2);
 massexpvec = collect(0:0.1:5);
 massvec = 10 .^massexpvec; #kg
-rho = 0.04;
-alpha = 1000; # Resource dispersion
+rho = 5.0*10^-9;
+alpha = 3; # Resource dispersion
 mu = 1;  # Resource mean
 foragehours = 2;
 tmax_bout = foragehours*60*60; # Set at 1/2 day (6) hours
@@ -127,7 +127,9 @@ for i=1:length(zetavec)
         forageseconds = copy(tmax_bout); #seconds
         homerangediameter = velocity*forageseconds; #meters
         homerangearea = pi*(homerangediameter/2)^2; #meters^2
-        n = ndensity*homerangearea; #inds/area
+        # n = ndensity*homerangearea; #inds/homerange
+        n = ndensity;
+        # n=1
         # rho * mu * (1/beta) = bite encounters/m^2 ~ bite encounter rate
         m = rho*mu*(1/beta);
         #Adjusted for competitive landscape
@@ -155,15 +157,15 @@ for i=1:length(zetavec)
     end
 end
 
-namespace = smartpath("figures/distancemean_mass_zeta.pdf")
+namespace = smartpath("figures/distancemean_mass_zeta_ndensity.pdf")
 R"""
 library(fields)
 pdf($namespace,width=7,height=7)
-image.plot(x=$zetavec,y=$massexpvec,z=log($(DMarray)),xlab='zeta',ylab='Mass 10^i (kg)',zlim=c(1,10))
+image.plot(x=$zetavec,y=$massexpvec,z=log($(DMarray)),xlab='zeta',ylab='Mass 10^i (kg)')
 dev.off()
 """
 
-namespace = smartpath("figures/distancevar_mass_zeta.pdf")
+namespace = smartpath("figures/distancevar_mass_zeta_ndensity.pdf")
 R"""
 library(fields)
 pdf($namespace,width=7,height=7)

@@ -61,13 +61,13 @@ function withindaysim_singleres(
 
             #Consumer population density: individuals/m^2
             ndensity = indperarea(mass); #individuals/m^2
-            # n=1; #Need to think harder about how n -> mprime
 
             forageseconds = copy(tmax_bout); #seconds
             homerangediameter = velocity*forageseconds; #meters
             homerangearea = pi*(homerangediameter/2)^2; #meters^2
-            n = ndensity*homerangearea; #inds/area
-
+            # n = ndensity*homerangearea; #inds/area
+            n = ndensity;
+            # n=1; #Need to think harder about how n -> mprime
 
             # mu*(1/beta) = resource density = bites/m^2
             # rho * mu * (1/beta) = bite encounters/m^2 ~ bite encounter rate

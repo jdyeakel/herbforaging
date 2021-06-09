@@ -7,18 +7,18 @@ end
 
 
 # TESTRUN
-rho = 0.033; #0.04;
-alpha = 1000; # Resource dispersion
+rho = 20*1.0e-9; #2.6*1.0e-9  collect(1:1:20).*10^-9
+alpha = 10; # Resource dispersion
 mu = 1;  # Resource mean
 zeta = 2; # Resource variability scaling
 edensity = 18.2; # Resource energy density kJ/gram (from YKR)
-mass = 1000; # KILOGRAMS
+mass = 10; # KILOGRAMS
 teeth = "bunodont"; # bunodont, acute/obtuse lophs, lophs and non-flat, lophs and flat
 gut_type = "caecum"; # caecum, colon, non-rumen foregut, rumen foregut
 kmax = 100; # 50 in Sevilleta NOTE: I *think* controls bin size?
 foragehours = 2;
 tmax_bout = foragehours*60*60; # Set at 1/2 day (6) hours
-cyears = 5;
+cyears = 5.08*mass^0.35; #Mean expected lifespan; Calder 1984; 10;
 configurations = 10000;
 
 gprob, ginfo, tout = withindaysim_singleres(rho,alpha,mu,zeta,edensity,mass,teeth,kmax,tmax_bout,configurations);
@@ -28,11 +28,11 @@ R"plot($ginfo,$gprob,type='b')"
 
 
 gr, cgut, cfat, ctraits = acrossdaysim_singleres(gprob,ginfo,edensity,mass,gut_type,cyears);
-namespace = smartpath("figures/trajectory2_M1000KG.pdf")
+# namespace = smartpath("figures/trajectory2_M1000KG.pdf")
 R"""
-pdf($namespace,width=6,height=5)
+# pdf($namespace,width=6,height=5)
 plot($(cfat/ctraits[1]),type='l',xlab = 'Days', ylab='Relative fat reserves')
-dev.off()
+# dev.off()
 """
 
 
