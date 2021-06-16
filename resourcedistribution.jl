@@ -101,7 +101,7 @@ dev.off()
 zetavec = collect(1:0.1:2);
 massexpvec = collect(0:0.1:5);
 massvec = 10 .^massexpvec; #kg
-rho = 5.0*10^-9;
+rho = 10^-11;
 alpha = 3; # Resource dispersion
 mu = 1;  # Resource mean
 foragehours = 2;

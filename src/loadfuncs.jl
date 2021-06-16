@@ -1,5 +1,6 @@
 using Distributed
 using UnicodePlots
+using ProgressMeter
 
 @everywhere using Distributions
 @everywhere using RCall

@@ -121,12 +121,14 @@ function withindaysim_singleres(
                         #The forager will move towards the closest resource
                         ttravel = distance_to_resource/velocity; # distance / velcity = time
                         
+                        #NOTE: I'm commenting out this precaution to trouble shoot why large consumers do well in poor environments!
+                        #NOTE: THIS SEEMS TO BE THE CUPLRIT! LEAVE IT OUT
                         # to avoid zero food encounters, FORCE the first or second draw a shorter distance!
-                        if tic == 1 || tic == 2
-                            if ttravel > (tmax_bout*0.9);
-                                ttravel = tmax_bout/10;
-                            end
-                        end
+                        # if tic == 1 || tic == 2
+                        #     if ttravel > (tmax_bout*0.9);
+                        #         ttravel = tmax_bout/10;
+                        #     end
+                        # end
                         t += ttravel; # time
                         t_travel += ttravel; # time
                         
