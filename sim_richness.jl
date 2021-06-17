@@ -7,7 +7,7 @@ end
 
 zvec = [1,2];
 # rhovec_orig = collect(0.1:1:100).*10^-9; #used with ndensity
-rhoexpvec = collect(-11:0.03:-7)
+rhoexpvec = collect(-11:0.03:-6)
 rhovec = 10 .^ rhoexpvec
 
 massexpvec = collect(0:0.1:4.4);
@@ -98,7 +98,7 @@ R"""
 library(RColorBrewer)
 pal=brewer.pal(length($gut_typevec),'Set1')
 pdf($namespace,width=6,height=5)
-plot($massexpvec,$(minrho[1,1,:]),ylim=c(0,11*10^-8),type='l',col=pal[1],lwd=2,xlab='Mass 10^i',ylab='Minimal viable richness')
+plot($massexpvec,$(minrho[1,1,:]),ylim=c(0,12*10^-8),type='l',col=pal[1],lwd=2,xlab='Mass 10^i',ylab='Minimal viable richness')
 """
 for i=1:length(teethvec)
     for j=1:length(gut_typevec)
@@ -106,7 +106,7 @@ for i=1:length(teethvec)
     end
 end
 R"""
-legend(3,4*10^-8,$gut_typevec,col=pal,pch=16,cex=0.8)
+legend(3,12*10^-8,$gut_typevec,col=pal,pch=16,cex=0.8)
 dev.off()
 """
 
@@ -132,7 +132,7 @@ R"""
 library(RColorBrewer)
 pal=brewer.pal(length($gut_typevec),'Set1')
 pdf($namespace,width=6,height=5)
-plot($massexpvec,$(minrho[1,1,:]),ylim=c(0,11*10^-8),type='l',col=pal[1],lwd=2,xlab='Mass 10^i',ylab='Minimal viable richness')
+plot($massexpvec,$(minrho[1,1,:]),ylim=c(0,20*10^-8),type='l',col=pal[1],lwd=2,xlab='Mass 10^i',ylab='Minimal viable richness')
 """
 for i=1:length(teethvec)
     for j=1:length(gut_typevec)
@@ -140,7 +140,7 @@ for i=1:length(teethvec)
     end
 end
 R"""
-legend(3,4*10^-8,$gut_typevec,col=pal,pch=16,cex=0.8)
+legend(3,20*10^-8,$gut_typevec,col=pal,pch=16,cex=0.8)
 dev.off()
 """
 
@@ -151,7 +151,7 @@ R"""
 library(RColorBrewer)
 pal=brewer.pal(length($gut_typevec),'Set1')
 pdf($namespace,width=6,height=5)
-plot($massexpvec,$(minrhoz1[1,1,:]) - $(minrhoz2[1,1,:]),ylim=c(-6*10^-8,4*10^-8),type='l',col=pal[1],lwd=2,xlab='Mass 10^i',ylab='Diff z1-z2: Minimal viable richness')
+plot($massexpvec,$(minrhoz1[1,1,:]) - $(minrhoz2[1,1,:]),ylim=c(-8*10^-8,4*10^-8),type='l',col=pal[1],lwd=2,xlab='Mass 10^i',ylab='Diff z1-z2: Minimal viable richness')
 """
 for i=1:length(teethvec)
     for j=1:length(gut_typevec)
@@ -167,3 +167,67 @@ dev.off()
 
 pty = lineplot(massexpvec,minrho[1,:])
 [lineplot!(pty,massexpvec,minrho[i,:]) for i=2:length(teethvec)]
+
+
+
+
+
+# Derivatives!
+
+filename = "figures/fig_dminrho_dmass_z1.pdf";
+namespace = smartpath(filename);
+drhomin_dmass = (-1) .* diff(minrhoz1[1,1,:]) ./ diff((10 .^ massexpvec));
+R"""
+library(RColorBrewer)
+pal=brewer.pal(length($gut_typevec),'Set1')
+pdf($namespace,width=6,height=5)
+plot($(massexpvec[1:(length(massexpvec)-1)]),$drhomin_dmass,type='l',col=pal[1],lwd=2,xlab='Initial mass 10^i',ylab='(-) drhomin/dmass',xlim=c(0,1),ylim=c(0,12*10^-8))
+"""
+for i=1:length(teethvec)
+    for j=1:length(gut_typevec)
+        drhomin_dmass = (-1) .* diff(minrhoz1[i,j,:]) ./ diff((10 .^ massexpvec));
+        R"lines($(massexpvec[1:(length(massexpvec)-1)]),$drhomin_dmass,col=pal[$j],lwd=2)"
+    end
+end
+# for i=1:length(teethvec)
+#     for j=1:length(gut_typevec)
+#         drhomin_dmass = (-1) .* diff(minrhoz2[i,j,:]) ./ diff((10 .^ massexpvec));
+#         R"lines($(massexpvec[1:(length(massexpvec)-1)]),$drhomin_dmass,col=pal[$j],lwd=2,lty=2)"
+#     end
+# end
+R"""
+legend(0.7,12*10^-8,$gut_typevec,col=pal,pch=16,cex=0.8)
+dev.off()
+"""
+
+filename = "figures/fig_dminrho_dmass_diffz1z2.pdf";
+namespace = smartpath(filename);
+drhomin_dmassz1 = (-1) .* diff(minrhoz1[1,1,:]) ./ diff((10 .^ massexpvec));
+drhomin_dmassz2 = (-1) .* diff(minrhoz2[1,1,:]) ./ diff((10 .^ massexpvec));
+R"""
+library(RColorBrewer)
+pal=brewer.pal(length($gut_typevec),'Set1')
+pdf($namespace,width=6,height=5)
+plot($(massexpvec[1:(length(massexpvec)-1)]),$drhomin_dmassz1-$drhomin_dmassz2,type='l',col=pal[1],lwd=2,xlab='Mass 10^i',ylab='(-) drhomin/dmass',xlim=c(0,1),ylim=c(-2*10^-8,2*10^-7.5))
+"""
+for i=1:length(teethvec)
+    for j=1:length(gut_typevec)
+        drhomin_dmassz1 = (-1) .* diff(minrhoz1[i,j,:]) ./ diff((10 .^ massexpvec));
+        drhomin_dmassz2 = (-1) .* diff(minrhoz2[i,j,:]) ./ diff((10 .^ massexpvec));
+        R"lines($(massexpvec[1:(length(massexpvec)-1)]),$drhomin_dmassz1-$drhomin_dmassz2,col=pal[$j],lwd=2)"
+    end
+end
+# for i=1:length(teethvec)
+#     for j=1:length(gut_typevec)
+#         drhomin_dmass = (-1) .* diff(minrhoz2[i,j,:]) ./ diff((10 .^ massexpvec));
+#         R"lines($(massexpvec[1:(length(massexpvec)-1)]),$drhomin_dmass,col=pal[$j],lwd=2,lty=2)"
+#     end
+# end
+R"""
+lines(seq(0,5),numeric(6),lty=3)
+legend(0.6,6*10^-8,$gut_typevec,col=pal,pch=16,cex=0.8)
+dev.off()
+"""
+
+
+#ylim=c(0,2*10^-7.5),

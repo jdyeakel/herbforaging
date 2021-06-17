@@ -7,16 +7,16 @@ end
 
 
 # TESTRUN
-rho = 10^-12; #2.6*1.0e-9  collect(1:1:20).*10^-9
+rho = 10^-9.7 #2.6*1.0e-9  collect(1:1:20).*10^-9
 alpha = 3; # Resource dispersion
 mu = 1;  # Resource mean
 zeta = 1; # Resource variability scaling
 edensity = 18.2; # Resource energy density kJ/gram (from YKR)
-mass = 10^4; # KILOGRAMS
+mass = 10^3; # KILOGRAMS
 teeth = "bunodont"; # bunodont, acute/obtuse lophs, lophs and non-flat, lophs and flat
 gut_type = "colon"; # caecum, colon, non-rumen foregut, rumen foregut
 kmax = 100; # 50 in Sevilleta NOTE: I *think* controls bin size?
-foragehours = 2;
+foragehours = 2; #NOTE: there is an allometric relationship for this
 tmax_bout = foragehours*60*60; # Set at 1/2 day (6) hours
 cyears = 5.08*mass^0.35; #Mean expected lifespan; Calder 1984; 10;
 configurations = 10000;
